@@ -229,4 +229,12 @@ form {
     .flag {
         width: 27rem;
     }
+
+    .country-details {
+        width: 27rem;
+    }
+
+    .search-country {
+        justify-content: space-evenly;
+    }
 }

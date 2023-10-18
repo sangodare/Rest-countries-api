@@ -5,7 +5,10 @@ const themeText = document.querySelector('.theme-text');
 const themeIcon = document.querySelector('.theme-icon');
 const filterCountries = document.querySelector('.filter-countries');
 const regions = document.querySelector('.regions');
-const countriesContainer = document.querySelector('.countries-container');
+const allCountries = document.querySelector('.all-countries');
+const regionCountries = document.querySelector('.region-countries');
+const searchResultContainer = document.querySelector('.search-country');
+const searchInput = document.querySelector('.search-box');
 
 
 //functions
@@ -28,56 +31,88 @@ function displayRegions() {
     regions.classList.toggle('hidden');
 }
 
-function renderCountries(data) {
+function renderCountries(data, container) {
 
     const markup = `
         <li class="country">
-            <img class="flag" src="${data[0].flags.png}" alt="${data[0].name.common}'s flag">
+            <img class="flag" src="${data.flags.png}" alt="${data.name.common}'s flag">
             <div class="country-details">
-                <h1 class="country-name">${data[0].name.common}</h1>
+                <h1 class="country-name">${data.name.common}</h1>
                 <div>
                     <span>Population:</span>
-                    <span>${new Intl.NumberFormat().format(data[0].population)}</span>
+                    <span>${new Intl.NumberFormat().format(data.population)}</span>
                 </div>
                 <div>
                     <span>Region:</span>
-                    <span>${data[0].region}</span>
+                    <span>${data.region}</span>
                 </div>
                 <div>
                     <span>Capital:</span>
-                    <span>${data[0].capital}</span>
+                    <span>${data.capital[0]}</span>
                 </div>
             </div>
         </li>
     `;    
-    countriesContainer.insertAdjacentHTML('beforeend', markup);
+    container.insertAdjacentHTML('beforeend', markup);
 }
 
-async function getCountryData(country, errorMsg = 'Reload the page') {
-    const response = await fetch(`https://restcountries.com/v3.1/name/${country}`);
+function displayErrorMessage(errorMsg, container) {
+    container.insertAdjacentText('beforeend', errorMsg);
+};
+
+async function getData(url, errorMsg = 'Please reload the page') {
+    const response = await fetch(url);
     if (!response.ok) throw new Error(errorMsg);
     return await response.json();
-
 }
 
 async function loadCountries() {
     try {
-        const data = await Promise.all([
-            getCountryData('germany'),
-            getCountryData('united states of america'),
-            getCountryData('brazil'),
-            getCountryData('iceland'),
-            getCountryData('afghanistan'),
-            getCountryData('Australia'),
-            getCountryData('albania'),
-            getCountryData('algeria')
-        ]);
-        data.map(countryData => renderCountries(countryData));
-        console.log(data);
-        data.map(data => console.log(data[0].flags.png));
+        const data = await getData(`https://restcountries.com/v3.1/all`);
+        data.map(data => renderCountries(data, allCountries));
+        
+    } catch(error) {
+        displayErrorMessage(error.message, allCountries);
+    }
+    
+}
 
-    } catch(err) {
-        console.log(err);
+async function displayRegion(e) {
+    try {
+        if(!e.target.classList.contains('region')) return;
+
+        const data = await getData(`https://restcountries.com/v3.1/region/${e.target.textContent}`);
+
+        allCountries.classList.add('hidden');
+        searchResultContainer.classList.add('hidden');
+        regionCountries.classList.remove('hidden');
+        regionCountries.innerHTML = "";
+
+        data.map(data => renderCountries(data, regionCountries));
+
+    } catch(error) {
+        displayErrorMessage(error.message, regionCountries);
+    }
+}
+
+async function displayCountry() {
+    try {
+        
+        allCountries.classList.add('hidden');
+        regionCountries.classList.add('hidden');
+        searchResultContainer.classList.remove('hidden');
+        searchResultContainer.innerHTML = "";
+        regions.classList.add('hidden');
+
+        const data = await getData(`https://restcountries.com/v3.1/all`);
+        
+        const filterData = data.filter(data => data.name.common.toLowerCase().startsWith(`${this.value.toLowerCase()}`));
+        if(filterData.length === 0) throw new Error('Country does not exist or search by using the common name of the country');
+        
+        filterData.map(data => renderCountries(data, searchResultContainer));
+
+    } catch(error) {
+        displayErrorMessage(error.message, searchResultContainer);
     }
     
 }
@@ -86,4 +121,6 @@ async function loadCountries() {
 
 theme.addEventListener('click', changeTheme);
 filterCountries.addEventListener('click', displayRegions);
+regions.addEventListener('click', displayRegion);
+searchInput.addEventListener('input', displayCountry);
 document.addEventListener('DOMContentLoaded', loadCountries);
