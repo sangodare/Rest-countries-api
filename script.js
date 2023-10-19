@@ -8,6 +8,7 @@ const regions = document.querySelector('.regions');
 const allCountries = document.querySelector('.all-countries');
 const regionCountries = document.querySelector('.region-countries');
 const searchResultContainer = document.querySelector('.search-country');
+const errorMessageContainer = document.querySelector('.error-msg');
 const searchInput = document.querySelector('.search-box');
 
 
@@ -48,7 +49,7 @@ function renderCountries(data, container) {
                 </div>
                 <div>
                     <span>Capital:</span>
-                    <span>${data.capital[0]}</span>
+                    <span>${data.capital?.length > 1 ? data.capital[0] : data.capital}</span>
                 </div>
             </div>
         </li>
@@ -70,7 +71,7 @@ async function loadCountries() {
     try {
         const data = await getData(`https://restcountries.com/v3.1/all`);
         data.map(data => renderCountries(data, allCountries));
-        
+
     } catch(error) {
         displayErrorMessage(error.message, allCountries);
     }
@@ -112,6 +113,7 @@ async function displayCountry() {
         filterData.map(data => renderCountries(data, searchResultContainer));
 
     } catch(error) {
+        console.log(error.message)
         displayErrorMessage(error.message, searchResultContainer);
     }
     

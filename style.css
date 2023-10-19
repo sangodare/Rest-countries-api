@@ -38,6 +38,10 @@
     font-size: 10px;
 }
 
+body {
+    background-color: var(--main-bg);
+}
+
 .font-home {
     font-size: 1.4rem;
 }
@@ -155,6 +159,7 @@ form {
 .countries-container {
     display: flex;
     justify-content: space-between;
+    color: var(--gen-text-clr);
 }
 
 .country-details {
@@ -181,6 +186,10 @@ form {
     font-size: 2rem;
     margin-bottom: 1rem;
 
+}
+
+.error-msg {
+    color: var(--gen-text-clr);
 }
 
 .hidden {
