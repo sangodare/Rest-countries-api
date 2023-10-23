@@ -130,7 +130,9 @@ async function details(country) {
     const allCountriesData = await getData(`https://restcountries.com/v3.1/all`);
     let links = [];
 
-    const borders = countryData[0].borders;
+    const filteredCountryData = countryData.length > 1 ? [countryData.find(countryDatum => countryDatum.name.common === country)] : countryData;
+
+    const borders = filteredCountryData[0].borders;
 
     const borderingCountries =  allCountriesData.filter(country => {
         
@@ -139,9 +141,9 @@ async function details(country) {
         });
     });
 
-    const native = Object.values(countryData[0].name.nativeName);
-    const currency = Object.values(countryData[0].currencies);
-    const languages = Object.values(countryData[0].languages).join(', ');
+    const native = Object.values(filteredCountryData[0].name.nativeName);
+    const currency = Object.values(filteredCountryData[0].currencies);
+    const languages = Object.values(filteredCountryData[0].languages).join(', ');
     
     const htmlLinks = links.map(link => {
         return `<a class="btn link-btn" href="#" data-name="${link}">${link}</a>`;
@@ -156,9 +158,9 @@ async function details(country) {
                 <span>Back</span>
             </button>
             <div class="country-dli-flex space">
-                <img class="country-dli-flag" src="${countryData[0].flags.png}" alt="${countryData[0].name.common}'s flag">
+                <img class="country-dli-flag" src="${filteredCountryData[0].flags.png}" alt="${filteredCountryData[0].name.common}'s flag">
                 <div class="country-dli-text">
-                    <h1 class="country-name">${countryData[0].name.common}</h1>
+                    <h1 class="country-name">${filteredCountryData[0].name.common}</h1>
                     <div class="country-dli-flex space">
                         <div>
                             <div class="country-detail">
@@ -167,25 +169,25 @@ async function details(country) {
                             </div>
                             <diV class="country-detail">
                                 <span class="font-wt-semibold">Population: </span>
-                                <span>${new Intl.NumberFormat().format(countryData[0].population)}</span>
+                                <span>${new Intl.NumberFormat().format(filteredCountryData[0].population)}</span>
                             </div>
                             <div class="country-detail">
                                 <span class="font-wt-semibold">Region: </span>
-                                <span>${countryData[0].region}</span>
+                                <span>${filteredCountryData[0].region}</span>
                             </div>
                             <div class="country-detail">
                                 <span class="font-wt-semibold">Sub Region: </span>
-                                <span>${countryData[0].subregion}</span>
+                                <span>${filteredCountryData[0].subregion}</span>
                             </div>
                             <div class="country-detail">
                                 <span class="font-wt-semibold">Capital: </span>
-                                <span>${countryData[0].capital.join(', ')}</span>
+                                <span>${filteredCountryData[0].capital.join(', ')}</span>
                             </div>
                         </div>
                         <div class="mg-top">
                             <div class="country-detail">
                                 <span class="font-wt-semibold">Top Level Domain: </span>
-                                <span>${countryData[0].tld[0]}</span>
+                                <span>${filteredCountryData[0].tld[0]}</span>
                             </div>
                             <div class="country-detail">
                                 <span class="font-wt-semibold">Currencies: </span>
