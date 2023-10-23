@@ -10,7 +10,9 @@ const regionCountries = document.querySelector('.region-countries');
 const searchResultContainer = document.querySelector('.search-country');
 const errorMessageContainer = document.querySelector('.error-msg');
 const searchInput = document.querySelector('.search-box');
-
+const countriesContainer = document.querySelector('.countries-container');
+const mainContent = document.querySelector('.main-content');
+const countryDetailedInfo = document.querySelector('.country-detailed-info');
 
 //functions
 function changeTheme() {
@@ -35,20 +37,20 @@ function displayRegions() {
 function renderCountries(data, container) {
 
     const markup = `
-        <li class="country">
+        <li class="country cursor-pointer" data-name="${data.name.common}">
             <img class="flag" src="${data.flags.png}" alt="${data.name.common}'s flag">
             <div class="country-details">
                 <h1 class="country-name">${data.name.common}</h1>
                 <div>
-                    <span>Population:</span>
+                    <span class="font-wt-semibold">Population:</span>
                     <span>${new Intl.NumberFormat().format(data.population)}</span>
                 </div>
                 <div>
-                    <span>Region:</span>
+                    <span class="font-wt-semibold">Region:</span>
                     <span>${data.region}</span>
                 </div>
                 <div>
-                    <span>Capital:</span>
+                    <span class="font-wt-semibold">Capital:</span>
                     <span>${data.capital?.length > 1 ? data.capital[0] : data.capital}</span>
                 </div>
             </div>
@@ -90,6 +92,7 @@ async function displayRegion(e) {
         regionCountries.innerHTML = "";
 
         data.map(data => renderCountries(data, regionCountries));
+        regions.classList.add('hidden');
 
     } catch(error) {
         displayErrorMessage(error.message, regionCountries);
@@ -113,16 +116,129 @@ async function displayCountry() {
         filterData.map(data => renderCountries(data, searchResultContainer));
 
     } catch(error) {
-        console.log(error.message)
         displayErrorMessage(error.message, searchResultContainer);
     }
     
-}
+};
+
+async function details(country) {
+   
+    mainContent.classList.add('hidden');
+    countryDetailedInfo.classList.remove('hidden');
+
+    const countryData = await getData(`https://restcountries.com/v3.1/name/${country}`);
+    const allCountriesData = await getData(`https://restcountries.com/v3.1/all`);
+    let links = [];
+
+    const borders = countryData[0].borders;
+
+    const borderingCountries =  allCountriesData.filter(country => {
+        
+        borders?.forEach(border => {
+            if(country.cca3.includes(border)) links.push(country.name.common);
+        });
+    });
+
+    const native = Object.values(countryData[0].name.nativeName);
+    const currency = Object.values(countryData[0].currencies);
+    const languages = Object.values(countryData[0].languages).join(', ');
+    
+    const htmlLinks = links.map(link => {
+        return `<a class="btn link-btn" href="#" data-name="${link}">${link}</a>`;
+    }).join('');
+
+    const markup = `
+        <div>
+            <button type="button" class="btn back-btn cursor-pointer">
+                <svg class="icons arrow-left">
+                    <use xlink:href="Icons/arrow-left-solid.svg#arrow-left"></use>
+                </svg>
+                <span>Back</span>
+            </button>
+            <div class="country-dli-flex space">
+                <img class="country-dli-flag" src="${countryData[0].flags.png}" alt="${countryData[0].name.common}'s flag">
+                <div class="country-dli-text">
+                    <h1 class="country-name">${countryData[0].name.common}</h1>
+                    <div class="country-dli-flex space">
+                        <div>
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Native Name: </span>
+                                <span>${native.length > 2 ? native[2].common : native[0].common}</span>
+                            </div>
+                            <diV class="country-detail">
+                                <span class="font-wt-semibold">Population: </span>
+                                <span>${new Intl.NumberFormat().format(countryData[0].population)}</span>
+                            </div>
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Region: </span>
+                                <span>${countryData[0].region}</span>
+                            </div>
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Sub Region: </span>
+                                <span>${countryData[0].subregion}</span>
+                            </div>
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Capital: </span>
+                                <span>${countryData[0].capital.join(', ')}</span>
+                            </div>
+                        </div>
+                        <div class="mg-top">
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Top Level Domain: </span>
+                                <span>${countryData[0].tld[0]}</span>
+                            </div>
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Currencies: </span>
+                                <span>${currency[0].name}</span>
+                            </div>
+                            <div class="country-detail">
+                                <span class="font-wt-semibold">Languages: </span>
+                                <span>${languages} </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bordering-countries">
+                        <span class="font-wt-semibold bc-text">Border Countries: </span>
+                        <span class="borders">${links.length != 0 ? htmlLinks : 'No bordering country'}<span>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    countryDetailedInfo.innerHTML = "";
+    countryDetailedInfo.insertAdjacentHTML('beforeend', markup);
+    
+};
+
+function displayDetailedInfo(e) {
+    if(e.target.closest('.country') == null) return;
+    const parentEl = e.target.closest('.country'); 
+
+    details(parentEl.dataset.name);
+};
+
+function displayAllOrdisplayCountry(e) {
+    if(e.target.closest('.back-btn') == null && !e.target.classList.contains('link-btn')) return;
+
+    if(e.target.closest('.back-btn')) {
+        mainContent.classList.remove('hidden');
+        countryDetailedInfo.classList.add('hidden');        
+    };
+
+    if(e.target.classList.contains('link-btn')) {
+        details(e.target.dataset.name);
+    };
+
+};
 
 //event listeners
-
 theme.addEventListener('click', changeTheme);
 filterCountries.addEventListener('click', displayRegions);
 regions.addEventListener('click', displayRegion);
 searchInput.addEventListener('input', displayCountry);
 document.addEventListener('DOMContentLoaded', loadCountries);
+countriesContainer.addEventListener('click', displayDetailedInfo);
+searchResultContainer.addEventListener('click', displayDetailedInfo);
+regionCountries.addEventListener('click', displayDetailedInfo);
+countryDetailedInfo.addEventListener('click', displayAllOrdisplayCountry);

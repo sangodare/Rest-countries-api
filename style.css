@@ -13,7 +13,7 @@
     --gen-text-clr: black;
     --main-bg: var(--very-light-gray);
     --icon-clr: var(--dark-gray-input);
-    -down-icon-clr: var(--gen-text-clr);
+    --down-icon-clr: var(--gen-text-clr);
     --very-dark-blue-dkmode: hsl(207, 26%, 17%);
     --very-dark-blue-ltmode: hsl(200, 15%, 8%);
     --dark-gray-input: hsl(0, 0%, 52%);
@@ -33,8 +33,7 @@
     --down-icon-clr: var(--white);
     --very-dark-blue-ltmode: hsl(200, 15%, 8%);
     --dark-gray-input: hsl(0, 0%, 52%);
-    --very-light-gray: hsl(0, 0%, 98%);
-  
+    --very-light-gray: hsl(0, 0%, 98%); 
     font-size: 10px;
 }
 
@@ -76,7 +75,7 @@ body {
     cursor: pointer;
 }
 
-header {
+.header {
     background-color: var(--gen-background-clr);
     color: var(--gen-text-clr);
 }
@@ -169,12 +168,8 @@ form {
     font-size: 1.6rem;
 }
 
-.country-details > div {
+.country-details > div, .country-detail {
     margin-top: .5rem;
-}
-
-.country-details > div > span:first-child {
-    font-weight: 600;
 }
 
 .flag {
@@ -190,6 +185,48 @@ form {
 
 .error-msg {
     color: var(--gen-text-clr);
+}
+
+.country-detailed-info {
+    color: var(--gen-text-clr);
+}
+
+.btn {
+    padding: .5rem 1.5rem .5rem 1.5rem;
+    background-color: var(--gen-background-clr);
+    color: var(--gen-text-clr);
+}
+
+.back-btn {
+    border: 0;
+    margin-bottom: 5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.arrow-left {
+    fill: var(--gen-text-clr);
+}
+
+.link-btn {
+    margin-right: 1rem;
+    margin-top: .5rem;
+    text-decoration: none;
+}
+
+.bordering-countries {
+    margin-top: 4rem;
+    display: flex;
+    gap: 2rem;
+}
+
+.bc-text {
+    align-self: center;
+}
+
+.borders {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .hidden {
@@ -228,6 +265,10 @@ form {
         width: 100%;
     }
 
+    .country-dli-text, .mg-top {
+        margin-top: 4rem;
+    }
+
 }
 
 @media (min-width: 700px) {
@@ -235,15 +276,25 @@ form {
         flex-wrap: wrap;
     }
 
-    .flag {
-        width: 27rem;
-    }
-
-    .country-details {
+    .flag, .country-details {
         width: 27rem;
     }
 
     .search-country {
         justify-content: space-evenly;
+    }
+
+    .country-dli-flex {
+        display: flex;
+        gap: 5rem;
+    }
+
+    .country-dli-flag {
+        height: 32rem;
+        width: 50rem;
+    }
+
+    .country-dli-text {
+        align-self: center;
     }
 }
